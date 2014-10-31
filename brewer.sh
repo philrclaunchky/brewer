@@ -14,19 +14,28 @@
 #
 #	-V		Set the verbose level of output
 
+# TODO: parse and validate parameters ($1 ,$2)
+# TODO: capture/validate options
+# TODO: implement -V logic
+
 FILE=~/sh.brew.formulas.txt
 
+#
+# Save list of install Homebrew formulas to a file.
+#
 function archive() {
 
-	# if verbose flag
 	echo "Archiving current list of Homebrew formulas ..."
-	# brew list >> ~/sh.brew.formulas.txt
+
 	brew list >> $FILE
-	
+
 	echo "$FILE created."
 
 }
 
+#
+# Install Homebrew, then install formulas.
+#
 function install() {
 	
 	# if $FILE doesn't exist, fail
@@ -38,8 +47,10 @@ function install() {
 	
 	# if Homebrew not installed, install it
 	type -P brew &>/dev/null && echo "Homebrew found ..." || {
+
 		echo "Installing Homebrew ..."
-		# ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+		ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
 	}
 
 	# get most-recent list of formulas
@@ -65,6 +76,9 @@ function install() {
 	echo "Processing completed."
 }
 
+#
+# Display help text.
+#
 help() {
 
 cat << EOF
@@ -87,7 +101,6 @@ EOF
 
 }
 
-# TODO: parse and validate parameters ($1 ,$2)
 # TODO: validate commands
 case $1 in
 	
@@ -105,6 +118,3 @@ case $1 in
 		break ;;
 
 esac
-
-# TODO: capture/validate options
-# TODO: implement -V
