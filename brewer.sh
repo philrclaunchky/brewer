@@ -14,6 +14,8 @@
 #
 #	-V		Set the verbose level of output
 
+FILE=~/sh.brew.formulas.txt
+
 function archive() {
 
 	# if verbose flag
@@ -24,11 +26,18 @@ function archive() {
 
 function install() {
 	
-	# TODO: if ~/sh.brew.formulas.txt doesn't exist, fail
+	# if ~/sh.brew.formulas.txt doesn't exist, fail
+	if [ ! -f $FILE ];
+	then
+	   echo "$FILE does not exist.  Please run './brewer archive' to create it."
+	   return
+	fi
 	
-	# 
-	echo "Installing Homebrew..."
-	# ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	# if Homebrew not installed, install it
+	type -P brew &>/dev/null && echo "Homebrew found." || {
+		echo "Installing Homebrew..."
+		# ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	}
 
 	# get most-recent list of formulas
 	echo "Updating Homebrew..."
@@ -41,9 +50,15 @@ function install() {
 	echo "Installing formulas..."
 	for i in $(cat ~/sh.brew.formulas.txt) ; do
 		echo $i
-	#  brew install $i
-	done
 		
+		# attempt to install formula
+		#  brew install $i
+
+		#TODO: if error (e.g. alread installed), write error, process next formula
+
+	done
+
+	echo "Processing completed."
 }
 
 help() {
@@ -54,7 +69,9 @@ help() {
 
 }
 
-# TODO: validate parameters
+# TODO: parse and validate parameters ($1 ,$2)
+
+# TODO: validate commands
 case $1 in
 	
 	"archive") archive
@@ -71,3 +88,5 @@ case $1 in
 		break ;;
 
 esac
+
+# TODO: capture/validate options
