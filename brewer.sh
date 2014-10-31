@@ -20,13 +20,16 @@ function archive() {
 
 	# if verbose flag
 	echo "Archiving current list of Homebrew formulas ..."
-	brew list >> ~/sh.brew.formulas.txt
-		
+	# brew list >> ~/sh.brew.formulas.txt
+	brew list >> $FILE
+	
+	echo "$FILE created."
+
 }
 
 function install() {
 	
-	# if ~/sh.brew.formulas.txt doesn't exist, fail
+	# if $FILE doesn't exist, fail
 	if [ ! -f $FILE ];
 	then
 	   echo "$FILE does not exist.  Please run './brewer archive' to create it."
@@ -34,7 +37,7 @@ function install() {
 	fi
 	
 	# if Homebrew not installed, install it
-	type -P brew &>/dev/null && echo "Homebrew found." || {
+	type -P brew &>/dev/null && echo "Homebrew found ..." || {
 		echo "Installing Homebrew ..."
 		# ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 	}
@@ -46,15 +49,16 @@ function install() {
 	# TODO: disable macports
 	echo "Disabling Macports ..."
 
-	# process list of formulas that have been installed
 	echo "Installing formulas..."
-	for i in $(cat $FILE) ; do
-		echo "Installing $i ..."
-		
-		# attempt to install formula
-		#  brew install $i
 
-		#TODO: if error (e.g. alread installed), write error, process next formula
+	# process list of formulas that have been installed
+	for i in $(< "$FILE") ; do
+
+		echo "Installing $i ..."
+
+		# attempt to install formula
+		# if error (e.g. alread installed), write error, process next formula
+		brew install $i || continue
 
 	done
 
@@ -62,8 +66,6 @@ function install() {
 }
 
 help() {
-
-	# TODO: finish help documentation
 
 cat << EOF
 
@@ -86,7 +88,6 @@ EOF
 }
 
 # TODO: parse and validate parameters ($1 ,$2)
-
 # TODO: validate commands
 case $1 in
 	
@@ -106,3 +107,4 @@ case $1 in
 esac
 
 # TODO: capture/validate options
+# TODO: implement -V
