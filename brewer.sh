@@ -14,7 +14,7 @@
 #
 #	-V		Set the verbose level of output
 
-function archive(flags) {
+function archive() {
 
 	# if verbose flag
 	echo "Archiving current list of Homebrew formulas..."
@@ -22,7 +22,7 @@ function archive(flags) {
 		
 }
 
-function install(flags) {
+function install() {
 	
 	# TODO: if ~/sh.brew.formulas.txt doesn't exist, fail
 	
