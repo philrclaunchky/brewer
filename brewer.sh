@@ -19,7 +19,7 @@ FILE=~/sh.brew.formulas.txt
 function archive() {
 
 	# if verbose flag
-	echo "Archiving current list of Homebrew formulas..."
+	echo "Archiving current list of Homebrew formulas ..."
 	brew list >> ~/sh.brew.formulas.txt
 		
 }
@@ -35,21 +35,21 @@ function install() {
 	
 	# if Homebrew not installed, install it
 	type -P brew &>/dev/null && echo "Homebrew found." || {
-		echo "Installing Homebrew..."
+		echo "Installing Homebrew ..."
 		# ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 	}
 
 	# get most-recent list of formulas
-	echo "Updating Homebrew..."
+	echo "Updating Homebrew ..."
 	brew update
 
 	# TODO: disable macports
-	echo "Disabling Macports..."
+	echo "Disabling Macports ..."
 
 	# process list of formulas that have been installed
 	echo "Installing formulas..."
-	for i in $(cat ~/sh.brew.formulas.txt) ; do
-		echo $i
+	for i in $(cat $FILE) ; do
+		echo "Installing $i ..."
 		
 		# attempt to install formula
 		#  brew install $i
@@ -64,8 +64,24 @@ function install() {
 help() {
 
 	# TODO: finish help documentation
-	echo "Valid arguments: archive, install, help"
-	echo "$ ./brewer.sh $1"
+
+cat << EOF
+
+Usage:
+
+  brewer command [options]
+
+Exmaples:
+
+  brewer archive
+  brewer install
+  brewer help
+
+Options:
+
+  -V     Enable verbose output
+
+EOF
 
 }
 
