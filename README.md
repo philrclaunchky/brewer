@@ -1,16 +1,22 @@
 Brewer
 ==
 
-Bash script to archive or restore workstation's Homebrew formulas.
+Bash shell script to archive or restore a workstation's Homebrew formulas.
 
 Installation
 ===
 
-~~~
-# make script executable
-$ chmod +x brewer.sh
+Make script executable
+====
 
-# make symlink
+~~~
+$ chmod +x brewer.sh
+~~~
+
+Create symlink
+====
+
+~~~
 $ ln -s brewer.sh brewer
 ~~~
 
