@@ -63,7 +63,8 @@ function install() {
 	echo "Installing formulas..."
 
 	# process list of formulas that have been installed
-	for i in $(< "$FILE") ; do
+	# ignoring lines that start with an '#'
+	for i in $( sed '/^#/ d' < "$FILE") ; do
 
 		echo "Installing $i ..."
 
