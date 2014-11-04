@@ -30,3 +30,13 @@ Install formulas (after an OS reinstall, for example):
 Get help:
 
 `$	./brewer help`
+
+Enhancements
+===
+- [Homebrew Cask](https://github.com/caskroom/homebrew-cask) support
+
+Contributors
+===
+- [Craig Buchanan](https://github.com/craibuc)
+
+Pull requests welcomed.
