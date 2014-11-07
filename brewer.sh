@@ -1,35 +1,113 @@
 #!/bin/sh
 
-# Usage:
-#
-#	brewer command [options]
-#
-# Exmaples:
-#
-#	brewer archive
-#	brewer install
-#	brewer help
-#
-# Options:
-#
-#	-V		Set the verbose level of output
+# Author:	Craig Buchanan
 
-# TODO: parse and validate parameters ($1 ,$2)
-# TODO: capture/validate options
-# TODO: implement -V logic
+# Purpose:	Archive currently installed Homebrew formulas to allow them to be reinstalled after a OS failure
 
-FILE=~/sh.brew.formulas.txt
+# Revision History:
+	# 31-OCT-2014 - created
+	# 07-NOV-2014 - command-line parameter support
+
+# Enhancements:
+# * Homebrew Cask support?
+
+# Reset POSIX variable in case getopts has been used previously in the shell.
+OPTIND=1
+
+# Initialize variables:
+FORMULAS=~/sh.brew.formulas.txt
+verbose=0
+show_help=0
+
+#
+# heredocs
+#
+GENERAL_HELP=$(cat << 'EOF'
+
+Usage:
+
+  brewer [options] command
+
+Exmaples:
+
+  brewer archive
+  brewer install
+
+Options:
+
+  -h     Display help
+  -v     Enable verbose output
+
+EOF)
+
+ARCHIVE_HELP=$(cat << 'EOF'
+
+Usage:
+
+  brewer [options] archive
+
+Exmaples:
+
+  brewer archive
+  brewer -f PATH/TO/FILE archive
+
+Options:
+
+  -f     file to use as destination (default: $FORMULAS)
+
+
+EOF)
+
+INSTALL_HELP=$(cat << 'EOF'
+
+Usage:
+
+  brewer [options] install
+
+Exmaples:
+
+  brewer install
+  brewer -f PATH/TO/FILE install
+
+Options:
+
+  -f     file to use as source (default: $FORMULAS)
+
+EOF)
 
 #
 # Save list of install Homebrew formulas to a file.
 #
 function archive() {
 
-	echo "Archiving current list of Homebrew formulas ..."
+    if [ $show_help -eq 1 ]; 
+    then
+        echo "$ARCHIVE_HELP\n"
+        exit 1
+    fi
 
-	brew list >> $FILE
+    if [ $verbose -eq 1 ]; 
+    then	
+		echo "Archiving current list of Homebrew formulas ..."
+	fi
+	
+	# make back-up current file if it exists
+	if [ -f $FORMULAS ]; then
+		
+	    if [ $verbose -eq 1 ]; 
+	    then
+			echo "Copying existing archive to $(basename $FORMULAS .txt)_$(stat -f "%Sm" -t "%Y%m%dT%H%M%S").txt ..."
+		fi
+		mv "$FORMULAS" "$(basename $FORMULAS .txt)_$(stat -f "%Sm" -t "%Y%m%dT%H%M%S").txt"
+	fi
 
-	echo "$FILE created."
+	# redirect command to a file
+	brew list >> $FORMULAS
+
+    if [ $verbose -eq 1 ]; 
+    then
+		echo "$FORMULAS created."
+	fi
 
 }
 
@@ -37,12 +115,21 @@ function archive() {
 # Install Homebrew, then install formulas.
 #
 function install() {
-	
+
+    if [ $show_help -eq 1 ]; 
+    then
+        echo "$INSTALL_HELP\n"
+        exit 1
+    fi
+		
 	# if $FILE doesn't exist, fail
-	if [ ! -f $FILE ];
+	if [ ! -f $FORMULAS ];
 	then
-	   echo "$FILE does not exist.  Please run './brewer archive' to create it."
-	   return
+	    if [ $verbose -eq 1 ]; 
+	    then
+	   		echo "$FORMULAS does not exist.  Please run './brewer archive' to create it."
+		fi
+	   exit 2
 	fi
 	
 	# if Homebrew not installed, install it
@@ -54,68 +141,71 @@ function install() {
 	}
 
 	# get most-recent list of formulas
-	echo "Updating Homebrew ..."
+    if [ $verbose -eq 1 ]; 
+    then
+		echo "Updating Homebrew ..."
+	fi
 	brew update
 
 	# TODO: disable macports
-	echo "Disabling Macports ..."
-
-	echo "Installing formulas..."
-
+    if [ $verbose -eq 1 ]; 
+    then
+		echo "Disabling Macports ..."
+	fi
+	
+    if [ $verbose -eq 1 ]; 
+    then
+		echo "Installing formulas..."
+	fi
+	
 	# process list of formulas that have been installed
 	# ignoring lines that start with an '#'
-	for i in $( sed '/^#/ d' < "$FILE") ; do
+	for i in $( sed '/^#/ d' < "$FORMULAS") ; do
 
-		echo "Installing $i ..."
-
+	    if [ $verbose -eq 1 ]; 
+	    then
+			echo "Installing $i ..."
+		fi
+		
 		# attempt to install formula
 		# if error (e.g. alread installed), write error, process next formula
 		brew install $i || continue
 
 	done
 
-	echo "Processing completed."
+    if [ $verbose -eq 1 ]; 
+    then
+		echo "Processing completed."
+	fi
 }
 
 #
-# Display help text.
+# Process command line
 #
-help() {
+while getopts "h?vf:" opt; do
 
-cat << EOF
+    case "$opt" in
+    h|\?)
+        show_help=1
+        ;;
+    v)  verbose=1
+        ;;
+    f)  FILE=$OPTARG
+        ;;
+    esac
+done
 
-Usage:
+shift $((OPTIND-1))
 
-  brewer command [options]
+[ "$1" = "--" ] && shift
 
-Exmaples:
+# echo "verbose=$verbose, show_help=$show_help, FILE='$FILE', Leftovers: $@"
 
-  brewer archive
-  brewer install
-  brewer help
+if [ $# -eq 0 ]
+  then
+    echo "$GENERAL_HELP\n"
+	exit 1
+fi
 
-Options:
-
-  -V     Enable verbose output
-
-EOF
-
-}
-
-# TODO: validate commands
-case $1 in
-	
-	"archive") archive
-        break ;;
-
-	"install") install
-		break ;;
-
-	"help") help
-		break;;
-
-	*) echo "Invalid entry: " $1
-		help
-		break ;;
-
-esac
+# run command
+$1
