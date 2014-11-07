@@ -36,7 +36,6 @@ Get help:
 Enhancements
 ===
 - [Homebrew Cask](https://github.com/caskroom/homebrew-cask) support
-<!-- http://lifehacker.com/how-to-make-your-own-bulk-app-installer-for-os-x-1586252163 -->
 
 Contributors
 ===
