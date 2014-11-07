@@ -29,11 +29,14 @@ Install formulas (after an OS reinstall, for example):
 
 Get help:
 
-`$	./brewer help`
+`$	./brewer -h archive`
+
+`$	./brewer -h install`
 
 Enhancements
 ===
 - [Homebrew Cask](https://github.com/caskroom/homebrew-cask) support
+<!-- http://lifehacker.com/how-to-make-your-own-bulk-app-installer-for-os-x-1586252163 -->
 
 Contributors
 ===
